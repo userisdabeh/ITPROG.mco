@@ -1,0 +1,30 @@
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 16px 128px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    height: 70px;
+}
+
+.logo,
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.brand-icon {
+    color: #fb923c;
+    font-size: 1.5rem;
+}
+
+.brand-name {
+    font-size: 1.5rem;
+    font-weight: 500;
+}
