@@ -55,7 +55,6 @@ function isActive($tab, $currentTab)
     </div>
 
     <!-- Tab Content -->
-    <div class="tab-content">
       <?php switch ($currentTab) {
           case "preferences":
               include "components/preferences/preferences.php";
@@ -71,7 +70,6 @@ function isActive($tab, $currentTab)
               include "components/profile-info/profile-info.php";
               break;
       } ?>
-    </div>
 
   </div>
 </body>

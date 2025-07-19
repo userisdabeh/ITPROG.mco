@@ -6,10 +6,26 @@ body {
     font-size: 16px;
 }
 
-.profile-container {
-    max-width: 830px;
-    margin: 40px auto;
-    padding: 0 1rem;
+.tab-content {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 10px 32px;
+    margin-bottom: 24px;
+}
+
+.section-header {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: -10px;
+}
+
+.section-subheader {
+    font-size: 16px;
+    font-weight: 400;
+    color: #6b7280;
+    margin-bottom: 24px;
 }
 
 .tabs {
@@ -51,14 +67,6 @@ a {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
     z-index: 1;
 }
-.tab-content {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    box-shadow: none;
-    padding: 32px;
-    margin-bottom: 24px;
-}
 
 @media (max-width: 1100px) {
     .profile-container {
@@ -74,4 +82,46 @@ a {
     .tab-content {
         padding: 20px 8px;
     }
+}
+
+/* buttons */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin: 12px 0px;
+}
+
+.save-btn,
+.cancel-btn {
+    padding: 6px 14px;
+    font-size: 14px;
+    border-radius: 5px;
+    font-weight: 500;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+/* Save (primary) */
+.save-btn {
+    background: #fb923c;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.save-btn:hover {
+    background: #f97316;
+}
+
+/* Cancel (outline) */
+.cancel-btn {
+    background: #fff;
+    color: #fb923c;
+    border: 1px solid #fb923c;
+    cursor: pointer;
+}
+
+.cancel-btn:hover {
+    background: #fff7ed;
 }

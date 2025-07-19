@@ -1,0 +1,23 @@
+select {
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 16px;
+    color: #444;
+    appearance: none;
+}
+
+input[type="password"] {
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 16px;
+    color: #444;
+}
+
+input[type="password"]:disabled {
+    color: #888;
+    background: #f3f4f6;
+}
