@@ -266,9 +266,9 @@ INSERT INTO `breeds` (`pet_type_id`, `breed_name`, `size_category`) VALUES
 (2, 'Domestic Longhair', 'Medium');
 
 -- Insert admin user
-INSERT INTO `users` (`full_name`, `email`, `password`, `age`, `current_address`, `permanent_address`, `phone`, `role`, `is_active`, `email_verified`) VALUES
-('Admin User', 'admin@wonderpets.com', '1234', 30, 'Shelter Address', 'Shelter Address', '+1234567890', 'admin', 1, 1),
-('Darren Sanchez', 'darren_sanchez@dlsu.edu.ph', '1234', 20, 'Mandaluyong', 'Mandaluyong', '+1234567890', 'user', 1, 1);
+INSERT INTO `users` (`full_name`, `email`, `password`, `age`, `current_address`, `permanent_address`, `phone`, `role`, `is_active`) VALUES
+('Admin User', 'admin@wonderpets.com', '1234', 30, 'Shelter Address', 'Shelter Address', '+1234567890', 'admin', 1),
+('Darren Sanchez', 'darren_sanchez@dlsu.edu.ph', '1234', 20, 'Mandaluyong', 'Mandaluyong', '+1234567890', 'user', 1);
 
 --
 -- Indexes for dumped tables
