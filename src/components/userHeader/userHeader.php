@@ -61,6 +61,7 @@
             <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A5.5 5.5 0 0112 15.5a5.5 5.5 0 016.879 2.304M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
+            <a href="../../pages/userProfile/index.php" class="profile-link">
             <span>Profile</span>
         </a>
 

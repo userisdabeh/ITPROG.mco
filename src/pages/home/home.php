@@ -88,7 +88,7 @@ $conn->close();
     <link rel="stylesheet" href="../../components/petCard/petCard.css">
 </head>
 <body>
-<?php include __DIR__ . '/../landingPage/components/header/userHeader.php'; ?>
+<?php include __DIR__ . '/../../components/userHeader/userHeader.php'; ?>
 
 <main class="container">
     <section class="hero-heading">
