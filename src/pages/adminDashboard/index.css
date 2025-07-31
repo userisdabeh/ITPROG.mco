@@ -1,0 +1,142 @@
+h1, h2, h3, h4, h5, h6, p, span {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+body {
+    display: flex;
+    font-family: 'Inter', sans-serif;
+}
+
+nav {
+    width: 250px;
+    border-right: 1px solid #ccc;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex-grow: 1;
+    margin-left: 250px;
+    min-height: 100vh;
+    padding: 24px;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 0;
+}
+
+.page-description {
+    font-size: 16px;
+    color: #666;
+}
+
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.summary-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-value {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.activity-plus-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.recent-activity,
+.quick-actions {
+    border: 1px solid #ccc;
+    padding: 24px;
+    border-radius: 8px;
+    width: calc(50% -  8px);
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.activity-title {
+    font-weight: 600;
+}
+
+.activity-details {
+    font-size: 0.95rem;
+    color: #666;
+}
+
+.activity-time {
+    font-size: 0.75rem;
+    font-weight: 600 !important;
+    border: 1px solid #ccc;
+    border-radius: 16px;
+    padding: 2px 8px !important;
+    text-align: center;
+}
+
+.quick-actions-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.quick-action-item {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.quick-action-item:hover {
+    background-color: #f0f0f0;
+}

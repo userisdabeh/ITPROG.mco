@@ -1,0 +1,58 @@
+.nav-wrapper {
+    padding: 12px !important;
+}
+
+.brand {
+    border-bottom: 1px solid #ccc;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+.brand-icon {
+    color: #fb923c !important;
+    font-size: 20px;
+}
+
+.brand-icon i {
+    align-self: center;
+}
+
+.brand-name {
+    font-size: 20px;
+    font-weight: 500;
+    color: #222;
+}
+
+.nav-links {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.nav-link {
+    width: 100%;
+    border-radius: 4px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-link:hover:not(.active) {
+    background-color: #f0f0f0;
+}
+
+.nav-link.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.logout {
+    margin-top: auto;
+}
