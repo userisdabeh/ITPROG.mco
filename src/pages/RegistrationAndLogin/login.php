@@ -38,7 +38,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $_SESSION['name'] = $user['full_name'];
                 $_SESSION['role'] = $user['role'];
 
-                header("Location: ../home/home.php");
+                if($user['role'] == 'admin') {
+                    header("Location: ../adminDashboard/index.php");
+                } else {
+                    header("Location: ../home/home.php");
+                }
+
                 exit;
             }
             // password hash
@@ -47,7 +52,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $_SESSION['name'] = $user['full_name'];
                 $_SESSION['role'] = $user['role'];
 
-                header("Location: ../home/home.php");
+                if($user['role'] == 'admin') {
+                    header("Location: ../adminDashboard/index.php");
+                } else {
+                    header("Location: ../home/home.php");
+                }
+
                 exit;
             } else {
                 $error = "Incorrect password.";

@@ -8,16 +8,80 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Set the current tab (default is 'personal')
+// Initial setup
 $currentTab = $_GET["tab"] ?? "personal";
 $isEditMode = isset($_GET['edit']) && $_GET['edit'] === 'true';
+$user_id = (int) $_SESSION['user_id'];
+$success_message = '';
+$error_message = '';
+$field_errors = [];
 
-// Function to determine active tab
+// Handle profile update
+if ($_SERVER["REQUEST_METHOD"] === "POST" && $currentTab === "personal" && $isEditMode) {
+    echo "<h3>✅ POST triggered!</h3>";
+
+    // Sanitize
+    $full_name = trim($_POST['full_name']);
+    $age = intval(trim($_POST['age'])); // Ensure integer
+    $phone = trim($_POST['phone']);
+    $email = trim(strtolower($_POST['email']));
+    $current_address = trim($_POST['current_address']);
+    $permanent_address = trim($_POST['permanent_address']);
+
+    // Debug print
+    echo "<pre>";
+    echo "full_name: $full_name\n";
+    echo "age: $age\n";
+    echo "phone: $phone\n";
+    echo "email: $email\n";
+    echo "current_address: $current_address\n";
+    echo "permanent_address: $permanent_address\n";
+    echo "</pre>";
+
+    // Validate (simplified)
+    if (empty($full_name) || empty($email)) {
+        echo "<strong>Missing required fields</strong>";
+        exit;
+    }
+
+    // SQL
+    echo "<p>🔧 Preparing SQL update...</p>";
+    $stmt = $conn->prepare("UPDATE users SET full_name = ?, age = ?, current_address = ?, permanent_address = ?, phone = ?, email = ? WHERE id = ?");
+    if (!$stmt) {
+        echo "❌ Prepare failed: " . $conn->error;
+        exit;
+    }
+
+    $stmt->bind_param("sissssi", $full_name, $age, $current_address, $permanent_address, $phone, $email, $user_id);
+    
+    if ($stmt->execute()) {
+        echo "<h3>✅ Update successful!</h3>";
+        $_SESSION['name'] = $full_name;
+        header("Location: index.php?tab=personal&edit=true&success=1");
+        exit;
+    } else {
+        echo "<strong>❌ Update failed:</strong> " . $stmt->error;
+        exit;
+    }
+}
+
+
+
+// Fetch current user
+$stmt = $conn->prepare("SELECT full_name, age, current_address, permanent_address, phone, email, profile_image, profile_image_type FROM users WHERE id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+$stmt->close();
+
+$GLOBALS['user'] = $user;
+$GLOBALS['conn'] = $conn;
+
 function isActive($tab, $currentTab) {
     return $tab === $currentTab ? "active" : "";
 }
 
-// Function to generate tab URL
 function getTabUrl($tab, $isEditMode) {
     $url = "?tab=" . $tab;
     if ($isEditMode) {
@@ -25,19 +89,6 @@ function getTabUrl($tab, $isEditMode) {
     }
     return $url;
 }
-
-$user_id = $_SESSION['user_id'];
-$success_message = '';
-$error_message = '';
-
-// Fetch current user data
-$stmt = $conn->prepare("SELECT full_name, age, current_address, permanent_address, phone, email FROM users WHERE id = ?");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-$stmt->close();
-$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -46,11 +97,7 @@ $conn->close();
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>User Profile</title>
-
-    <!-- Global Styles -->
     <link rel="stylesheet" href="index.css?v=<?= time() ?>" />
-
-    <!-- Component CSS -->
     <link rel="stylesheet" href="components/navbar/navbar.css?v=<?= time() ?>" />
     <link rel="stylesheet" href="components/profile-card/profile-card.css?v=<?= time() ?>" />
     <link rel="stylesheet" href="components/profile-info/profile-info.css?v=<?= time() ?>" />
@@ -59,7 +106,6 @@ $conn->close();
 </head>
 <body>
     <?php include "components/navbar/navbar.php"; ?>
-
     <div class="profile-container">
         <?php include "components/profile-card/profile-card.php"; ?>
 
@@ -71,19 +117,13 @@ $conn->close();
             <div class="error-message"><?= htmlspecialchars($error_message) ?></div>
         <?php endif; ?>
 
-        <!-- Tab Navigation -->
         <div class="tabs">
-            <a href="<?= getTabUrl('personal', $isEditMode) ?>" 
-               class="tab <?= isActive("personal", $currentTab) ?>">Personal Info</a>
-            <a href="<?= getTabUrl('preferences', $isEditMode) ?>" 
-               class="tab <?= isActive("preferences", $currentTab) ?>">Account Settings</a>
-            <a href="<?= getTabUrl('favorites', $isEditMode) ?>" 
-               class="tab <?= isActive("favorites", $currentTab) ?>">Favorites</a>
-            <a href="<?= getTabUrl('history', $isEditMode) ?>" 
-               class="tab <?= isActive("history", $currentTab) ?>">History</a>
+            <a href="<?= getTabUrl('personal', $isEditMode) ?>" class="tab <?= isActive("personal", $currentTab) ?>">Personal Info</a>
+            <a href="<?= getTabUrl('preferences', $isEditMode) ?>" class="tab <?= isActive("preferences", $currentTab) ?>">Account Settings</a>
+            <a href="<?= getTabUrl('favorites', $isEditMode) ?>" class="tab <?= isActive("favorites", $currentTab) ?>">Favorites</a>
+            <a href="<?= getTabUrl('history', $isEditMode) ?>" class="tab <?= isActive("history", $currentTab) ?>">History</a>
         </div>
 
-        <!-- Tab Content -->
         <?php 
         switch ($currentTab) {
             case "personal":
