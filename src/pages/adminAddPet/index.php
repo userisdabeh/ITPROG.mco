@@ -259,7 +259,7 @@
                     </div>
                 </fieldset>
                 <div class="submit-buttons">
-                    <button type="button" class="btn btn-secondary" onclick="window.location.href='../adminPets'">Cancel</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='javascript:history.back();'">Cancel</button>
                     <button type="submit" class="btn btn-primary">Add Pet</button>
                 </div>
             </form>
