@@ -3,7 +3,7 @@
     include_once '../../../server/db.php';
 
     if(!isset($_SESSION['user_id'])) {
-        header('Location: ../RegistrationAndLogin/login.php');
+        header('Location: ../auth/login.php');
         exit;
     }
 
