@@ -2,7 +2,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require(__DIR__ . '/../../../server/db.php');
+require '../../../server/db.php';
 
 $errors = [];
 $success = false;

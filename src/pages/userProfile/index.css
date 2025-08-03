@@ -1,16 +1,11 @@
-body {
-    background: #f8fafc;
-    font-family: "Inter", Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    font-size: 16px;
-}
+@import url('../../styles/globals.css');
+@import url('../../styles/components.css');
 
 .tab-content {
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 6px;
-    padding: 10px 32px;
+    padding: 30px 32px;
     margin-bottom: 24px;
 }
 
@@ -89,39 +84,4 @@ a {
     display: flex;
     gap: 12px;
     margin: 12px 0px;
-}
-
-.save-btn,
-.cancel-btn {
-    padding: 6px 14px;
-    font-size: 14px;
-    border-radius: 5px;
-    font-weight: 500;
-    transition:
-        background 0.2s ease,
-        color 0.2s ease;
-}
-
-/* Save (primary) */
-.save-btn {
-    background: #fb923c;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-}
-
-.save-btn:hover {
-    background: #f97316;
-}
-
-/* Cancel (outline) */
-.cancel-btn {
-    background: #fff;
-    color: #fb923c;
-    border: 1px solid #fb923c;
-    cursor: pointer;
-}
-
-.cancel-btn:hover {
-    background: #fff7ed;
 }

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require(__DIR__ . '/../../../server/db.php');
+require '../../../server/db.php';
 
 $error = "";
 $success_message = "";

@@ -1,4 +1,5 @@
 <?php
+require '../../../server/db.php';
 // Get edit mode from query parameter
 $isEditMode = isset($_GET['edit']) && $_GET['edit'] === 'true';
 
@@ -8,8 +9,6 @@ $error_message = '';
 
 // Handle password update
 if ($_SERVER["REQUEST_METHOD"] === "POST" && $isEditMode) {
-    require(__DIR__ . '/../../../../../server/db.php');
-    
     $current_password = $_POST['current_password'];
     $new_password = $_POST['new_password'];
     $confirm_password = $_POST['confirm_password'];
@@ -23,25 +22,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && $isEditMode) {
         $error_message = "New password must be at least 4 characters long";
     } else {
         // Verify current password
-        $stmt = $conn->prepare("SELECT password FROM users WHERE id = ?");
-        $stmt->bind_param("i", $_SESSION['user_id']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        $stmt->close();
+        $user_id = (int)$_SESSION['user_id'];
+        $sql = "SELECT password FROM users WHERE id = $user_id";
+        $result = $conn->query($sql);
+        $user = $result ? $result->fetch_assoc() : null;
 
-        if (password_verify($current_password, $user['password'])) {
+        if ($user && password_verify($current_password, $user['password'])) {
             // Update password
             $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
-            $stmt->bind_param("si", $hashed_password, $_SESSION['user_id']);
+            $escaped_password = $conn->real_escape_string($hashed_password);
+            $update_sql = "UPDATE users SET password = '$escaped_password' WHERE id = $user_id";
             
-            if ($stmt->execute()) {
+            if ($conn->query($update_sql)) {
                 $success_message = "Password updated successfully!";
             } else {
-                $error_message = "Error updating password: " . $stmt->error;
+                $error_message = "Error updating password: " . $conn->error;
             }
-            $stmt->close();
         } else {
             $error_message = "Current password is incorrect";
         }
@@ -64,24 +60,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && $isEditMode) {
 
     <form method="POST" action="" class="preferences-form <?= !$isEditMode ? 'view-mode' : '' ?>">
         <div class="form-group">
-            <label for="current_password">Current Password</label>
+            <label for="current_password" class="form-label">Current Password</label>
             <input type="password" id="current_password" name="current_password" 
+                   class="input input-md"
                    placeholder="Enter your current password"
                    <?= !$isEditMode ? 'disabled' : '' ?>>
         </div>
 
         <div class="form-row">
             <div class="form-group">
-                <label for="new_password">New Password</label>
+                <label for="new_password" class="form-label">New Password</label>
                 <input type="password" id="new_password" name="new_password" 
+                       class="input input-md"
                        placeholder="Enter new password"
                        minlength="4"
                        <?= !$isEditMode ? 'disabled' : '' ?>>
             </div>
 
             <div class="form-group">
-                <label for="confirm_password">Confirm New Password</label>
+                <label for="confirm_password" class="form-label">Confirm New Password</label>
                 <input type="password" id="confirm_password" name="confirm_password" 
+                       class="input input-md"
                        placeholder="Confirm new password"
                        minlength="4"
                        <?= !$isEditMode ? 'disabled' : '' ?>>
@@ -89,8 +88,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && $isEditMode) {
         </div>
 
         <div class="form-actions" <?= !$isEditMode ? 'style="display: none;"' : '' ?>>
-            <button type="submit" class="save-btn">Update Password</button>
-            <button type="reset" class="cancel-btn">Reset</button>
+            <button type="submit" class="btn btn-md btn-primary">Update Password</button>
+            <button type="reset" class="btn btn-md btn-secondary">Reset</button>
         </div>
     </form>
 </div>

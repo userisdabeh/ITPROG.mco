@@ -1,10 +1,11 @@
 <?php
 session_start();
-include(__DIR__ . '/../../../server/db.php');
+require '../../../server/db.php';
+require '../../../server/image.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../RegistrationAndLogin/login.php");
+    header("Location: ../auth/login.php");
     exit();
 }
 
@@ -16,64 +17,20 @@ $success_message = '';
 $error_message = '';
 $field_errors = [];
 
-// Handle profile update
-if ($_SERVER["REQUEST_METHOD"] === "POST" && $currentTab === "personal" && $isEditMode) {
-    echo "<h3>✅ POST triggered!</h3>";
-
-    // Sanitize
-    $full_name = trim($_POST['full_name']);
-    $age = intval(trim($_POST['age'])); // Ensure integer
-    $phone = trim($_POST['phone']);
-    $email = trim(strtolower($_POST['email']));
-    $current_address = trim($_POST['current_address']);
-    $permanent_address = trim($_POST['permanent_address']);
-
-    // Debug print
-    echo "<pre>";
-    echo "full_name: $full_name\n";
-    echo "age: $age\n";
-    echo "phone: $phone\n";
-    echo "email: $email\n";
-    echo "current_address: $current_address\n";
-    echo "permanent_address: $permanent_address\n";
-    echo "</pre>";
-
-    // Validate (simplified)
-    if (empty($full_name) || empty($email)) {
-        echo "<strong>Missing required fields</strong>";
-        exit;
-    }
-
-    // SQL
-    echo "<p>🔧 Preparing SQL update...</p>";
-    $stmt = $conn->prepare("UPDATE users SET full_name = ?, age = ?, current_address = ?, permanent_address = ?, phone = ?, email = ? WHERE id = ?");
-    if (!$stmt) {
-        echo "❌ Prepare failed: " . $conn->error;
-        exit;
-    }
-
-    $stmt->bind_param("sissssi", $full_name, $age, $current_address, $permanent_address, $phone, $email, $user_id);
-    
-    if ($stmt->execute()) {
-        echo "<h3>✅ Update successful!</h3>";
-        $_SESSION['name'] = $full_name;
-        header("Location: index.php?tab=personal&edit=true&success=1");
-        exit;
-    } else {
-        echo "<strong>❌ Update failed:</strong> " . $stmt->error;
-        exit;
-    }
+// Handle success/error messages from URL parameters
+if (isset($_GET['success']) && $_GET['success'] == '1') {
+    $success_message = "Profile updated successfully!";
+}
+if (isset($_GET['error'])) {
+    $error_message = htmlspecialchars($_GET['error']);
 }
 
 
 
 // Fetch current user
-$stmt = $conn->prepare("SELECT full_name, age, current_address, permanent_address, phone, email, profile_image, profile_image_type FROM users WHERE id = ?");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-$stmt->close();
+$sql = "SELECT full_name, age, current_address, permanent_address, phone, email, profile_image, profile_image_type FROM users WHERE id = $user_id";
+$result = $conn->query($sql);
+$user = $result ? $result->fetch_assoc() : null;
 
 $GLOBALS['user'] = $user;
 $GLOBALS['conn'] = $conn;
@@ -89,6 +46,55 @@ function getTabUrl($tab, $isEditMode) {
     }
     return $url;
 }
+
+// Handle profile update
+if ($_SERVER["REQUEST_METHOD"] === "POST" && $currentTab === "personal" && $isEditMode && isset($_POST['full_name'])) {
+    echo "<h3>✅ POST triggered!</h3>";
+
+    $full_name = $conn->real_escape_string(trim($_POST['full_name']));
+    $age = intval(trim($_POST['age']));
+    $phone = $conn->real_escape_string(trim($_POST['phone']));
+    $email = $conn->real_escape_string(trim(strtolower($_POST['email'])));
+    $current_address = $conn->real_escape_string(trim($_POST['current_address']));
+    $permanent_address = $conn->real_escape_string(trim($_POST['permanent_address']));
+    
+    $sql = "UPDATE users SET full_name = '$full_name', age = $age, current_address = '$current_address', permanent_address = '$permanent_address', phone = '$phone', email = '$email' WHERE id = $user_id";
+
+    $result = $conn->query($sql);
+    if (!$result) {
+        echo "❌ Query failed: " . $conn->error;
+        exit;
+    }
+
+    if ($conn->affected_rows > 0) {
+        $_SESSION['name'] = $full_name;
+        header("Location: index.php?tab=personal&edit=true&success=1");
+        exit;
+    } else if ($conn->affected_rows === 0) {
+        header("Location: index.php?tab=personal&edit=true&success=1");
+        exit;
+    } else{
+        header("Location: index.php?tab=personal&edit=true&error=" . urlencode("Update failed"));
+        exit;
+    }
+}
+
+// Handle image upload
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_FILES['profile_image']) && !isset($_POST['full_name'])) {
+    $image = imageUpload('profile_image');
+    
+    $image_data = $image['image_data'] ? $conn->real_escape_string($image['image_data']) : null;
+    $image_type = $image['image_type'] ? $conn->real_escape_string($image['image_type']) : null;
+    $sql = "UPDATE users SET profile_image = '$image_data', profile_image_type = '$image_type' WHERE id = $user_id";
+
+    if ($conn->query($sql)) {
+        header("Location: index.php?tab=" . $currentTab . ($isEditMode ? "&edit=true" : "") . "&success=1");
+        exit();
+    } else {
+        header("Location: index.php?tab=" . $currentTab . ($isEditMode ? "&edit=true" : "") . "&error=" . urlencode("Error updating profile image"));
+        exit();
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -98,24 +104,15 @@ function getTabUrl($tab, $isEditMode) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>User Profile</title>
     <link rel="stylesheet" href="index.css?v=<?= time() ?>" />
-    <link rel="stylesheet" href="components/navbar/navbar.css?v=<?= time() ?>" />
     <link rel="stylesheet" href="components/profile-card/profile-card.css?v=<?= time() ?>" />
     <link rel="stylesheet" href="components/profile-info/profile-info.css?v=<?= time() ?>" />
     <link rel="stylesheet" href="components/preferences/preferences.css?v=<?= time() ?>" />
     <link rel="stylesheet" href="components/favorites/favorites.css?v=<?= time() ?>" />
 </head>
 <body>
-    <?php include "components/navbar/navbar.php"; ?>
+    <?php require_once('../../components/userHeader.php'); ?>
     <div class="profile-container">
-        <?php include "components/profile-card/profile-card.php"; ?>
-
-        <?php if (!empty($success_message)): ?>
-            <div class="success-message"><?= htmlspecialchars($success_message) ?></div>
-        <?php endif; ?>
-
-        <?php if (!empty($error_message)): ?>
-            <div class="error-message"><?= htmlspecialchars($error_message) ?></div>
-        <?php endif; ?>
+        <?php require('components/profile-card/profile-card.php'); ?>
 
         <div class="tabs">
             <a href="<?= getTabUrl('personal', $isEditMode) ?>" class="tab <?= isActive("personal", $currentTab) ?>">Personal Info</a>
@@ -127,16 +124,16 @@ function getTabUrl($tab, $isEditMode) {
         <?php 
         switch ($currentTab) {
             case "personal":
-                include "components/profile-info/profile-info.php";
+                require 'components/profile-info/profile-info.php';
                 break;
             case "preferences":
-                include "components/preferences/preferences.php";
+                require 'components/preferences/preferences.php';
                 break;
             case "favorites":
-                include "components/favorites/favorites.php";
+                require 'components/favorites/favorites.php';
                 break;
             case "history":
-                include "components/history/history.php";
+                require 'components/history/history.php';
                 break;
         }
         ?>
