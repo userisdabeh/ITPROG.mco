@@ -1,0 +1,51 @@
+.filters-toggle {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-5);
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: var(--font-weight-semibold);
+    white-space: nowrap;
+    color: var(--text);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.filters-toggle:hover {
+    background: var(--brand);
+    color: white;
+    border-color: var(--brand);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--brand-shadow);
+}
+
+.filters-toggle.active {
+    background: var(--brand);
+    color: white;
+    border-color: var(--brand);
+}
+
+.toggle-icon {
+    font-size: var(--font-size-lg);
+    transition: transform var(--transition);
+}
+
+.toggle-text {
+    font-weight: var(--font-weight-semibold);
+}
+
+.filter-count {
+    background: rgba(255, 255, 255, 0.2);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+}
+
+.filters-toggle:not(.active) .filter-count {
+    background: rgba(0, 0, 0, 0.1);
+    color: var(--muted);
+}

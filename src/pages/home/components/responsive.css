@@ -1,0 +1,76 @@
+@media (max-width: 768px) {
+    .container {
+        padding: var(--space-4);
+    }
+    
+    .search-filters {
+        padding: var(--space-4);
+        margin-bottom: var(--space-6);
+    }
+    
+    .search-section {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-3);
+    }
+    
+    .search-box {
+        min-width: auto;
+        border-radius: 12px;
+    }
+    
+    .filters-toggle {
+        justify-content: center;
+    }
+    
+    .filter-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .filter-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-actions .btn {
+        padding: var(--space-4);
+        text-align: center;
+    }
+    
+    .pets-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: var(--space-4);
+    }
+}
+
+@media (max-width: 480px) {
+    .search-filters {
+        padding: var(--space-3);
+        margin: 0 calc(-1 * var(--space-2)) var(--space-4);
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+    
+    .hero-heading h1 {
+        font-size: var(--font-size-2xl);
+    }
+    
+    .hero-heading {
+        text-align: center;
+        margin-bottom: var(--space-6);
+    }
+    
+    .filter-row {
+        gap: var(--space-3);
+    }
+    
+    .filter-group {
+        gap: var(--space-2);
+    }
+    
+    .pets-grid {
+        grid-template-columns: 1fr;
+    }
+}
