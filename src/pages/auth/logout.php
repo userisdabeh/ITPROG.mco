@@ -7,6 +7,6 @@ session_unset();
 session_destroy();
 
 // Redirect to login or landing page
-header("Location: ../landingPage/index.php");
+header("Location: ../landing/index.php");
 exit();
 ?>
