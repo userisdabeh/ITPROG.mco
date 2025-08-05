@@ -60,6 +60,8 @@
         <link rel="stylesheet" href="../../components/admin/nav.css?v=<?php echo time(); ?>">
 
         <script src="index.js?v=<?php echo time(); ?>" defer></script>
+
+        <script src="../../components/admin/nav.js?v=<?php echo time(); ?>" defer></script>
     </head>
     <body>
         <?php include '../../components/admin/nav.php' ?>
@@ -233,16 +235,16 @@
                                 <td class="text-center"><?php echo $pet['gender']; ?></td>
                                 <td class="text-center"><?php echo $pet['size']; ?></td>
                                 <td class="text-center"><?php echo $pet['weight']; ?></td>
-                                <td class="text-center"><?php echo $pet['is_spayed_neutered'] ? '<i class="bi bi-check-circle"></i>' : '<i class="bi bi-x-circle"></i>'; ?></td>
-                                <td class="text-center"><?php echo $pet['is_house_trained'] ? '<i class="bi bi-check-circle"></i>' : '<i class="bi bi-x-circle"></i>'; ?></td>
-                                <td class="text-center"><?php echo $pet['good_with_kids'] ? '<i class="bi bi-check-circle"></i>' : '<i class="bi bi-x-circle"></i>'; ?></td>
-                                <td class="text-center"><?php echo $pet['good_with_pets'] ? '<i class="bi bi-check-circle"></i>' : '<i class="bi bi-x-circle"></i>'; ?></td>
+                                <td class="text-center"><?php echo $pet['is_spayed_neutered'] ? '<i class="bi bi-check-circle text-success"></i>' : '<i class="bi bi-x-circle text-danger"></i>'; ?></td>
+                                <td class="text-center"><?php echo $pet['is_house_trained'] ? '<i class="bi bi-check-circle text-success"></i>' : '<i class="bi bi-x-circle text-danger"></i>'; ?></td>
+                                <td class="text-center"><?php echo $pet['good_with_kids'] ? '<i class="bi bi-check-circle text-success"></i>' : '<i class="bi bi-x-circle text-danger"></i>'; ?></td>
+                                <td class="text-center"><?php echo $pet['good_with_pets'] ? '<i class="bi bi-check-circle text-success"></i>' : '<i class="bi bi-x-circle text-danger"></i>'; ?></td>
                                 <td class="text-center"><?php echo $pet['energy_level']; ?></td>
-                                <td class="text-center"><?php echo $pet['status']; ?></td>
+                                <td class="text-center text-capitalize"><?php echo $pet['status']; ?></td>
                                 <td class="text-center"><?php echo $pet['is_featured']; ?></td>
                                 <td class="text-center">
-                                    <input type="file" name="pet-documents" id="pet-documents" class="form-control" hidden>
-                                    <button type="button" class="btn btn-primary" data-bs-id="<?php echo $pet['id']; ?>">
+                                    <input type="file" name="pet-documents" id="pet-documents" class="form-control" hidden multiple enctype="multipart/form-data">
+                                    <button type="button" class="btn btn-primary" id="upload-document-btn" data-bs-id="<?php echo $pet['id']; ?>">
                                         <i class="bi bi-upload"></i>
                                     </button>
                                 </td>
