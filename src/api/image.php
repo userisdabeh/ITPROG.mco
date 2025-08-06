@@ -1,6 +1,4 @@
 <?php
-// Image handling utility functions
-
 function imageUpload($file_name = 'image') {
     $image_data = null;
     $image_type = null;
