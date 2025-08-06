@@ -343,3 +343,13 @@ INSERT INTO `pets` (`name`, `pet_type_id`, `breed_id`, `age_years`, `age_months`
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+DELIMITER $$
+CREATE TRIGGER t_log_new_pet
+AFTER INSERT ON pets
+FOR EACH ROW
+BEGIN
+  INSERT INTO activity_logs (user_id, activity_type, description, related_table, related_id, ip_address, user_agent)
+  VALUES (1, 'New Pet Added', CONCAT('New pet added: ', NEW.name), 'pets', NEW.id, NULL, NULL);
+END
+$$ DELIMITER ;
