@@ -60,8 +60,6 @@
         <link rel="stylesheet" href="../../components/admin/nav.css?v=<?php echo time(); ?>">
 
         <script src="index.js?v=<?php echo time(); ?>" defer></script>
-
-        <script src="../../components/admin/nav.js?v=<?php echo time(); ?>" defer></script>
     </head>
     <body>
         <?php include '../../components/admin/nav.php' ?>

@@ -1,0 +1,35 @@
+h1, h2, h3, h4, h5, h6, p, span.reset {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+body {
+    display: flex;
+    font-family: 'Inter', sans-serif;
+}
+
+nav {
+    width: 250px;
+    border-right: 1px solid #ccc;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex-grow: 1;
+    margin-left: 250px;
+    min-height: 100vh;
+    padding: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    overflow-y: hidden;
+}
