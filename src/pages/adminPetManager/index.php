@@ -14,6 +14,8 @@
                                         p.id,
                                         p.microchip_id,
                                         p.name,
+                                        p.pet_type_id,
+                                        p.breed_id,
                                         pt.type_name,
                                         b.breed_name,
                                         p.age_years,
@@ -249,10 +251,28 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="pet-actions">
-                                        <button type="button" class="btn btn-primary" data-bs-id="<?php echo $pet['id']; ?>">
+                                        <button type="button" class="btn btn-primary edit-btn"
+                                            data-bs-id="<?= $pet['id']; ?>"
+                                            data-name="<?= $pet['name']; ?>"
+                                            data-age-years="<?= $pet['age_years']; ?>"
+                                            data-age-months="<?= $pet['age_months']; ?>"
+                                            data-weight="<?= $pet['weight']; ?>"
+                                            data-type="<?= $pet['pet_type_id']; ?>"
+                                            data-breed="<?= $pet['breed_id']; ?>"
+                                            data-gender="<?= $pet['gender']; ?>"
+                                            data-size="<?= $pet['size']; ?>"
+                                            data-status="<?= $pet['status']; ?>"
+                                            data-energy="<?= $pet['energy_level']; ?>"
+                                            data-spayed="<?= $pet['is_spayed_neutered']; ?>"
+                                            data-house="<?= $pet['is_house_trained']; ?>"
+                                            data-kids="<?= $pet['good_with_kids']; ?>"
+                                            data-pets="<?= $pet['good_with_pets']; ?>"
+                                            data-featured="<?= $pet['is_featured']; ?>"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editPetModal">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
-                                        <button type="button" class="btn btn-danger" data-bs-id="<?php echo $pet['id']; ?>">
+                                        <button type="button" class="btn btn-danger delete-btn" data-bs-id="<?php echo $pet['id']; ?>">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </div>
@@ -264,5 +284,137 @@
                 </div>
             </section>
         </main>
+        <!-- Edit Pet Modal -->
+<div class="modal fade" id="editPetModal" tabindex="-1" aria-labelledby="editPetModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="POST" action="editPet.php" id="editPetForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editPetModalLabel">Edit Pet</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body row g-3">
+          <input type="hidden" name="id" id="edit-pet-id">
+
+          <div class="col-md-6">
+            <label for="edit-name" class="form-label">Name</label>
+            <input type="text" class="form-control" name="name" id="edit-name">
+          </div>
+
+          <div class="col-md-6">
+            <label for="editPetType" class="form-label">Pet Type</label>
+            <select id="editPetType" name="pet_type_id" class="form-select">
+              <?php
+              $types = $conn->query("SELECT id, type_name FROM pet_types");
+              while ($row = $types->fetch_assoc()):
+              ?>
+                <option value="<?= $row['id'] ?>"><?= $row['type_name'] ?></option>
+              <?php endwhile; ?>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="editPetBreed" class="form-label">Breed</label>
+            <select id="editPetBreed" name="breed_id" class="form-select">
+              <?php
+              $breeds = $conn->query("SELECT id, breed_name FROM breeds");
+              while ($row = $breeds->fetch_assoc()):
+              ?>
+                <option value="<?= $row['id'] ?>"><?= $row['breed_name'] ?></option>
+              <?php endwhile; ?>
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label for="edit-age-years" class="form-label">Age (Years)</label>
+            <input type="number" class="form-control" name="age_years" id="edit-age-years" min="0">
+          </div>
+
+          <div class="col-md-3">
+            <label for="edit-age-months" class="form-label">Age (Months)</label>
+            <input type="number" class="form-control" name="age_months" id="edit-age-months" min="0">
+          </div>
+
+          <div class="col-md-4">
+            <label for="edit-gender" class="form-label">Gender</label>
+            <select class="form-select" name="gender" id="edit-gender">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Unknown">Unknown</option>
+            </select>
+          </div>
+
+          <div class="col-md-4">
+            <label for="edit-size" class="form-label">Size</label>
+            <select class="form-select" name="size" id="edit-size">
+              <option value="Small">Small</option>
+              <option value="Medium">Medium</option>
+              <option value="Large">Large</option>
+              <option value="Extra Large">Extra Large</option>
+            </select>
+          </div>
+
+          <div class="col-md-4">
+            <label for="edit-weight" class="form-label">Weight (kg)</label>
+            <input type="number" step="0.01" class="form-control" name="weight" id="edit-weight">
+          </div>
+
+          <div class="col-md-6">
+            <label for="edit-status" class="form-label">Status</label>
+            <select class="form-select" name="status" id="edit-status">
+              <option value="available">Available</option>
+              <option value="pending">Pending</option>
+              <option value="adopted">Adopted</option>
+              <option value="medical_hold">Medical Hold</option>
+              <option value="unavailable">Unavailable</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="edit-energy" class="form-label">Energy Level</label>
+            <select class="form-select" name="energy_level" id="edit-energy">
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+
+          <div class="col-md-12">
+            <label for="edit-description" class="form-label">Description</label>
+            <textarea class="form-control" name="description" id="edit-description" rows="2"></textarea>
+          </div>
+
+          <!-- Toggles -->
+          <div class="col-md-3 form-check">
+            <input type="checkbox" class="form-check-input" id="edit-spayed" name="is_spayed_neutered">
+            <label for="edit-spayed" class="form-check-label">Spayed/Neutered</label>
+          </div>
+          <div class="col-md-3 form-check">
+            <input type="checkbox" class="form-check-input" id="edit-house-trained" name="is_house_trained">
+            <label for="edit-house-trained" class="form-check-label">House Trained</label>
+          </div>
+          <div class="col-md-3 form-check">
+            <input type="checkbox" class="form-check-input" id="edit-good-kids" name="good_with_kids">
+            <label for="edit-good-kids" class="form-check-label">Good with Kids</label>
+          </div>
+          <div class="col-md-3 form-check">
+            <input type="checkbox" class="form-check-input" id="edit-good-pets" name="good_with_pets">
+            <label for="edit-good-pets" class="form-check-label">Good with Other Pets</label>
+          </div>
+          <div class="col-md-3 form-check">
+            <input type="checkbox" class="form-check-input" id="edit-featured" name="is_featured">
+            <label for="edit-featured" class="form-check-label">Featured</label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
     </body>
 </html>

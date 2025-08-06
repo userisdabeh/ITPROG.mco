@@ -58,6 +58,97 @@
     } catch (Exception $e) {
         echo "Error: " . $e->getMessage();
     }
+
+    $month = date('m');
+    $year = date('Y');
+
+    // Pets added this month
+    $getPetsThisMonth = $conn->prepare("SELECT COUNT(*) AS pets_this_month FROM pets WHERE MONTH(created_at) = ? AND YEAR(created_at) = ?");
+    $getPetsThisMonth->bind_param("ii", $month, $year);
+    $getPetsThisMonth->execute();
+    $petsMonth = $getPetsThisMonth->get_result()->fetch_assoc();
+
+    // Users registered this month
+    $getUsersThisMonth = $conn->prepare("SELECT COUNT(*) AS users_this_month FROM users WHERE MONTH(created_at) = ? AND YEAR(created_at) = ?");
+    $getUsersThisMonth->bind_param("ii", $month, $year);
+    $getUsersThisMonth->execute();
+    $usersMonth = $getUsersThisMonth->get_result()->fetch_assoc();
+
+    // New pending apps this month
+    $getPendingAppsThisMonth = $conn->prepare("SELECT COUNT(*) AS pendings_this_month FROM adoption_applications WHERE status = 'pending' AND MONTH(created_at) = ? AND YEAR(created_at) = ?");
+    $getPendingAppsThisMonth->bind_param("ii", $month, $year);
+    $getPendingAppsThisMonth->execute();
+    $pendingMonth = $getPendingAppsThisMonth->get_result()->fetch_assoc();
+
+    // Adoptions this month
+    $getAdoptionsThisMonth = $conn->prepare("SELECT COUNT(*) AS adoptions_this_month FROM adoptions WHERE MONTH(created_at) = ? AND YEAR(created_at) = ?");
+    $getAdoptionsThisMonth->bind_param("ii", $month, $year);
+    $getAdoptionsThisMonth->execute();
+    $adoptionsMonth = $getAdoptionsThisMonth->get_result()->fetch_assoc();
+
+    // Latest added pet
+    $getRecentPet = $conn->query("
+        SELECT 
+            pets.name AS pet_name,
+            breeds.breed_name,
+            pets.created_at
+        FROM pets
+        LEFT JOIN breeds ON pets.breed_id = breeds.id
+        ORDER BY pets.created_at DESC
+        LIMIT 1
+    ");
+    $recentPet = $getRecentPet->fetch_assoc();
+
+    // Latest approved application
+    $getRecentApproved = $conn->query("
+        SELECT u.full_name, p.name AS pet_name, aa.updated_at 
+        FROM adoption_applications aa 
+        JOIN users u ON aa.user_id = u.id 
+        JOIN pets p ON aa.pet_id = p.id 
+        WHERE aa.status = 'approved' 
+        ORDER BY aa.updated_at DESC 
+        LIMIT 1
+    ");
+    $recentApproved = $getRecentApproved->fetch_assoc();
+
+    // Latest rejected application
+    $getRecentRejected = $conn->query("
+        SELECT u.full_name, p.name AS pet_name, aa.updated_at 
+        FROM adoption_applications aa 
+        JOIN users u ON aa.user_id = u.id 
+        JOIN pets p ON aa.pet_id = p.id 
+        WHERE aa.status = 'rejected' 
+        ORDER BY aa.updated_at DESC 
+        LIMIT 1
+    ");
+    $recentRejected = $getRecentRejected->fetch_assoc();
+
+    // Latest adoption
+    $getRecentAdoption = $conn->query("
+        SELECT u.full_name, p.name AS pet_name, a.created_at 
+        FROM adoptions a 
+        JOIN users u ON a.user_id = u.id 
+        JOIN pets p ON a.pet_id = p.id 
+        ORDER BY a.created_at DESC 
+        LIMIT 1
+    ");
+    $recentAdoption = $getRecentAdoption->fetch_assoc();
+
+    function timeAgo($datetime) {
+        $timestamp = strtotime($datetime);
+        $difference = time() - $timestamp;
+
+        if ($difference < 60)
+            return $difference . ' seconds ago';
+        elseif ($difference < 3600)
+            return floor($difference / 60) . ' minutes ago';
+        elseif ($difference < 86400)
+            return floor($difference / 3600) . ' hours ago';
+        else
+            return floor($difference / 86400) . ' days ago';
+    }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -94,7 +185,7 @@
                     </div>
                     <div class="card-body">
                         <h2 class="card-value"><?php echo $totalPets['total_pets']; ?></h2>
-                        <p class="card-delta-value">+ 12 this month</p>
+                        <p class="card-delta-value">+ <?php echo $petsMonth['pets_this_month']; ?> this month</p>
                     </div>
                 </article>
                 <article class="summary-card">
@@ -104,7 +195,7 @@
                     </div>
                     <div class="card-body">
                         <h2 class="card-value"><?php echo $totalUsers['total_users']; ?></h2>
-                        <p class="card-delta-value">+ 12 this month</p>
+                        <p class="card-delta-value">+ <?php echo $usersMonth['users_this_month']; ?> this month</p>
                     </div>
                 </article>
                 <article class="summary-card">
@@ -114,7 +205,7 @@
                     </div>
                     <div class="card-body">
                         <h2 class="card-value"><?php echo $pendingApplications['pendings']; ?></h2>
-                        <p class="card-delta-value">+ 12 this month</p>
+                        <p class="card-delta-value">+ <?php echo $pendingMonth['pendings_this_month']; ?> this month</p>
                     </div>
                 </article>
                 <article class="summary-card">
@@ -124,7 +215,7 @@
                     </div>
                     <div class="card-body">
                         <h2 class="card-value"><?php echo $totalAdoptions['total_adoptions']; ?></h2>
-                        <p class="card-delta-value">+ 12 this month</p>
+                        <p class="card-delta-value">+ <?php echo $adoptionsMonth['adoptions_this_month']; ?> this month</p>
                     </div>
                 </article>
             </section>
@@ -135,30 +226,36 @@
                         <div class="activity-item">
                             <div class="activity-alert">
                                 <h6 class="activity-title">New Pet Added</h6>
-                                <p class="activity-details">Golden Retriever - Max</p>
+                                <?= $recentPet ? $recentPet['breed_name'] . " - " . $recentPet['pet_name'] : 'No recent pet' ?>
                             </div>
-                            <span class="activity-time">2 hours ago</span>
+                            <span class="activity-time"><?= $recentPet ? timeAgo($recentPet['created_at']) : '' ?></span>
                         </div>
                         <div class="activity-item">
                             <div class="activity-alert">
                                 <h6 class="activity-title">Application Approved</h6>
-                                <p class="activity-details">Dwayne Wade - Golden Retriever</p>
+                                <p class="activity-details">
+                                    <?= $recentApproved ? htmlspecialchars($recentApproved['full_name'] . ' - ' . $recentApproved['pet_name']) : 'No recent approval' ?>
+                                </p>
                             </div>
-                            <span class="activity-time">7 hours ago</span>
+                            <span class="activity-time"><?= $recentApproved ? timeAgo($recentApproved['updated_at']) : 'N/A' ?></span>
                         </div>
                         <div class="activity-item">
                             <div class="activity-alert">
                                 <h6 class="activity-title">Application Rejected</h6>
-                                <p class="activity-details">Hassan Whiteside - Doberman</p>
+                                <p class="activity-details">
+                                    <?= $recentRejected ? htmlspecialchars($recentRejected['full_name'] . ' - ' . $recentRejected['pet_name']) : 'No recent rejection' ?>
+                                </p>
                             </div>
-                            <span class="activity-time">1 day ago</span>
+                            <span class="activity-time"><?= $recentRejected ? timeAgo($recentRejected['updated_at']) : 'N/A' ?></span>
                         </div>
                         <div class="activity-item">
                             <div class="activity-alert">
                                 <h6 class="activity-title">Pet Adopted</h6>
-                                <p class="activity-details">Tim Duncan - Dalmatian</p>
+                                <p class="activity-details">
+                                    <?= $recentAdoption ? htmlspecialchars($recentAdoption['full_name'] . ' - ' . $recentAdoption['pet_name']) : 'No recent adoption' ?>
+                                </p>
                             </div>
-                            <span class="activity-time">1 day ago</span>
+                            <span class="activity-time"><?= $recentAdoption ? timeAgo($recentAdoption['adoption_date']) : 'N/A' ?></span>
                         </div>
                     </div>
                 </section>
