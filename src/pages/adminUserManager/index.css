@@ -27,9 +27,64 @@ nav {
 main {
     flex-grow: 1;
     margin-left: 250px;
-    min-height: 100vh;
     padding: 24px;
     display: flex;
     flex-wrap: wrap;
     overflow-y: hidden;
+}
+
+.main-header {
+    width: 100%;
+}
+
+.filter-form {
+    width: 25%;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-right: 24px;
+    height: fit-content;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.users-list {
+    width: calc(75% - 24px);
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+}
+
+.user-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-action {
+    border: 1px solid #ccc;
+    transition: all 0.3s ease;
+}
+
+.btn-action:hover {
+    border: 1px solid #ccc;
+}
+
+.btn-action:active {
+    border: 1px solid #ccc;
+}
+
+.user-details {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
