@@ -165,8 +165,8 @@
                     </div>
                     <div class="mb-3">
                         <div class="form-check">
-                            <input type="checkbox" name="pet-is-spayed/neutered" id="pet-is-spayed/neutered" class="form-check-input">
-                            <label for="pet-is-spayed/neutered" class="form-check-label">Spayed/Neutered</label>
+                            <input type="checkbox" name="pet-is-spayed-neutered" id="pet-is-spayed-neutered" class="form-check-input">
+                            <label for="pet-is-spayed-neutered" class="form-check-label">Spayed/Neutered</label>
                         </div>
                         <div class="form-check">
                             <input type="checkbox" name="pet-is-house-trained" id="pet-is-house-trained" class="form-check-input">
@@ -241,7 +241,7 @@
                                 <td class="text-center"><?php echo $pet['good_with_pets'] ? '<i class="bi bi-check-circle text-success"></i>' : '<i class="bi bi-x-circle text-danger"></i>'; ?></td>
                                 <td class="text-center"><?php echo $pet['energy_level']; ?></td>
                                 <td class="text-center text-capitalize"><?php echo $pet['status']; ?></td>
-                                <td class="text-center"><?php echo $pet['is_featured']; ?></td>
+                                <td class="text-center"><?php echo $pet['is_featured'] ? '<i class="bi bi-check-circle text-success"></i>' : '<i class="bi bi-x-circle text-danger"></i>'; ?></td>
                                 <td class="text-center">
                                     <input type="file" name="pet-documents" id="pet-documents" class="form-control" hidden multiple enctype="multipart/form-data">
                                     <button type="button" class="btn btn-primary" id="upload-document-btn" data-bs-id="<?php echo $pet['id']; ?>">
