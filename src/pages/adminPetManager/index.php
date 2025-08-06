@@ -30,7 +30,7 @@
                                         p.is_featured
                                     FROM pets p
                                     JOIN pet_types pt ON p.pet_type_id = pt.id
-                                    JOIN breeds b ON b.id = pt.id
+                                    JOIN breeds b ON b.id = p.breed_id
                                     ORDER BY p.id ASC;");
         if ($getPets) {
             $getPets->execute();
