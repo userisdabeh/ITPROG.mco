@@ -24,7 +24,14 @@
     <body>
         <?php include '../../components/admin/nav.php'; ?>
         <main>
-
+            <section class="main-header">
+                <h3>User Manager</h3>
+                <div class="action-buttons">
+                    <div class="input-group">
+                        <span></span>
+                    </div>
+                </div>
+            </section>
         </main>
     </body>
 </html>
