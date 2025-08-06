@@ -1,5 +1,5 @@
 <?php
-include "../../server/image.php";
+include "../../../api/image.php";
 $isEditMode = isset($_GET['edit']) && $_GET['edit'] === 'true';
 $currentTab = $_GET['tab'] ?? 'personal';
 

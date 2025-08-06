@@ -1,7 +1,7 @@
 <?php
 session_start();
 require '../../../server/db.php';
-require '../../../server/image.php';
+require '../../api/image.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
