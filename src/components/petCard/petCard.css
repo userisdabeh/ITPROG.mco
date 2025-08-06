@@ -85,6 +85,16 @@
     fill: var(--error);
 }
 
+.favorite-btn.favorited {
+    opacity: 1;
+    transform: scale(1);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.favorite-btn.favorited:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
 /* Pet Info Section */
 .pet-info {
     padding: var(--space-4);

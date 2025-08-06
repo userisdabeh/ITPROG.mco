@@ -119,6 +119,19 @@
     color: #e74c3c;
 }
 
+.favorite-btn.favorited {
+    background: rgba(231, 76, 60, 0.1);
+}
+
+.favorite-btn.favorited .heart-icon {
+    color: #e74c3c;
+    fill: #e74c3c;
+}
+
+.favorite-btn.favorited:hover {
+    background: rgba(231, 76, 60, 0.2);
+}
+
 .image-thumbnails {
     display: flex;
     gap: 0.5rem;

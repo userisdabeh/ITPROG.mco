@@ -10,6 +10,9 @@ $gender = htmlspecialchars($pet['gender'] ?? '');
 $description = htmlspecialchars($pet['description'] ?? '');
 $petId = htmlspecialchars($pet['id'] ?? '');
 $is_featured = !empty($pet['is_featured']) && $pet['is_featured'];
+$is_favorited = !empty($pet['is_favorited']) && $pet['is_favorited'];
+
+$current_page = $_SERVER['REQUEST_URI'];
 
 $image_src = '';
 if (!empty($pet['pet_image'])) {
@@ -32,14 +35,19 @@ if (!empty($pet['pet_image'])) {
     <?php } ?>
     <div class='pet-image-container'>
         <img src='<?= $image_src ?>' alt='<?= $name ?>' class='pet-image' />
+        <?php if (isset($_SESSION['user_id'])): ?>
         <form method="post" action="../../api/favorites.php" class="favorite-form">
             <input type="hidden" name="pet_id" value="<?= $petId ?>">
-            <button type="submit" class='favorite-btn' aria-label='Add to favorites'>
-                <svg class='heart-icon' viewBox='0 0 24 24' fill='none'>
+            <input type="hidden" name="redirect_url" value="<?= htmlspecialchars($current_page) ?>">
+            <button type="submit" class='favorite-btn <?= $is_favorited ? 'favorited' : '' ?>' 
+                    aria-label='<?= $is_favorited ? 'Remove from favorites' : 'Add to favorites' ?>' 
+                    title='<?= $is_favorited ? 'Remove from favorites' : 'Add to favorites' ?>'>
+                <svg class='heart-icon' viewBox='0 0 24 24' <?= $is_favorited ? 'fill="currentColor"' : 'fill="none"' ?>>
                     <path d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>
                 </svg>
             </button>
         </form>
+        <?php endif; ?>
     </div>
     
     <div class='pet-info'>
@@ -62,7 +70,7 @@ if (!empty($pet['pet_image'])) {
             <a href='../petProfile/index.php?id=<?= $petId ?>' class='btn btn-sm btn-ghost'>
                 View Details
             </a>
-            <a href='../adoptionApplication/index.php?pet_id=<?= $petId ?>' class='btn btn-sm btn-primary'>
+            <a href='../petApplication/index.php?pet_id=<?= $petId ?>' class='btn btn-sm btn-primary'>
                 Adopt Me
             </a>
         </div>

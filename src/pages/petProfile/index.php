@@ -48,6 +48,11 @@ $application_sql = "SELECT id FROM adoption_applications WHERE user_id = $user_i
 $app_result = $conn->query($application_sql);
 $existing_application = $app_result ? $app_result->fetch_assoc() : null;
 
+// Check if pet is favorited by user
+$favorite_sql = "SELECT id FROM user_favorites WHERE user_id = $user_id AND pet_id = $pet_id";
+$fav_result = $conn->query($favorite_sql);
+$is_favorited = $fav_result && $fav_result->num_rows > 0;
+
 $conn->close();
 
 // Format age display
@@ -109,8 +114,11 @@ if (!empty($pet['pet_image'])) {
                         
                         <form method="post" action="../../api/favorites.php" class="favorite-form">
                             <input type="hidden" name="pet_id" value="<?= $pet['id'] ?>">
-                            <button type="submit" class="favorite-btn" aria-label="Add to favorites">
-                                <svg class="heart-icon" viewBox="0 0 24 24" fill="none">
+                            <input type="hidden" name="redirect_url" value="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>">
+                            <button type="submit" class="favorite-btn <?= $is_favorited ? 'favorited' : '' ?>" 
+                                    aria-label="<?= $is_favorited ? 'Remove from favorites' : 'Add to favorites' ?>"
+                                    title="<?= $is_favorited ? 'Remove from favorites' : 'Add to favorites' ?>">
+                                <svg class="heart-icon" viewBox="0 0 24 24" <?= $is_favorited ? 'fill="currentColor"' : 'fill="none"' ?>>
                                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                             </button>

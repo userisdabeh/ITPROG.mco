@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// ---- Filters / Search ----
+// ilters / Search
 $q        = trim($_GET['q'] ?? '');
 $type_id  = $_GET['type']  ?? '';
 $breed_id = $_GET['breed'] ?? '';
@@ -19,16 +19,19 @@ $size     = $_GET['size'] ?? '';
 $featured_only = isset($_GET['featured']);
 
 // Build SQL with WHERE clause
+$user_id = (int)$_SESSION['user_id'];
 $sql = "
 SELECT  p.*,
         b.breed_name,
         pt.type_name,
         (COALESCE(p.age_years,0) * 12 + COALESCE(p.age_months,0)) AS age_in_months,
-        (SELECT photo_path FROM pet_photos WHERE pet_id = p.id AND is_primary = 1 LIMIT 1) AS primary_photo
+        (SELECT photo_path FROM pet_photos WHERE pet_id = p.id AND is_primary = 1 LIMIT 1) AS primary_photo,
+        CASE WHEN uf.user_id IS NOT NULL THEN 1 ELSE 0 END AS is_favorited
 FROM pets p
 LEFT JOIN breeds b     ON b.id = p.breed_id
 JOIN pet_types pt      ON pt.id = p.pet_type_id
-WHERE 1=1
+LEFT JOIN user_favorites uf ON uf.pet_id = p.id AND uf.user_id = $user_id
+WHERE p.status != 'adopted' AND p.status != 'unavailable'
 ";
 
 if ($q !== '') {
