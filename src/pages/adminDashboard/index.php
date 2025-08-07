@@ -37,7 +37,7 @@
 
     // Get pending applications
     try {
-        $getPendingApplications = $conn->prepare("SELECT COUNT(*) AS pendings FROM adoption_applications WHERE status = 'pending'");
+        $getPendingApplications = $conn->prepare("SELECT COUNT(*) AS pendings FROM adoption_applications WHERE status = 'submitted'");
         if ($getPendingApplications) {
             $getPendingApplications->execute();
             $result = $getPendingApplications->get_result();
@@ -75,7 +75,7 @@
     $usersMonth = $getUsersThisMonth->get_result()->fetch_assoc();
 
     // New pending apps this month
-    $getPendingAppsThisMonth = $conn->prepare("SELECT COUNT(*) AS pendings_this_month FROM adoption_applications WHERE status = 'pending' AND MONTH(created_at) = ? AND YEAR(created_at) = ?");
+    $getPendingAppsThisMonth = $conn->prepare("SELECT COUNT(*) AS pendings_this_month FROM adoption_applications WHERE status = 'submitted' AND MONTH(created_at) = ? AND YEAR(created_at) = ?");
     $getPendingAppsThisMonth->bind_param("ii", $month, $year);
     $getPendingAppsThisMonth->execute();
     $pendingMonth = $getPendingAppsThisMonth->get_result()->fetch_assoc();

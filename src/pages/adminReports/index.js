@@ -1,85 +1,92 @@
 document.addEventListener('DOMContentLoaded', () => {
+    fetch('api/fetch_reports.php')
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                console.error(data.message);
+                return;
+            }
+
+            displayReports(data.data);
+        })
+        .catch(err => console.error("Error:", err));
+});
+
+function displayReports(data) {
+    const update = (id, value) => {
+        document.getElementById(id).textContent = value ?? 0;
+        document.getElementById(id + "-percentage").textContent =
+            data.total_applications > 0
+                ? `${((value / data.total_applications) * 100).toFixed(2)}% of total applications`
+                : '0% of total applications';
+    };
+
+    update('total-submitted', data.total_submitted);
+    update('total-for-review', data.total_for_review);
+    update('total-for-interview', data.total_for_interview);
+    update('total-approved', data.total_approved);
+    update('total-denied', data.total_denied);
+    update('total-completed', data.total_completed);
+    update('total-withdrawn', data.total_withdrawn);
+
+    document.getElementById('total-applications').textContent = data.total_applications;
+    document.getElementById('total-applications-percentage').textContent = 'Overall';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
     const filterSelect = document.getElementById('report-filter');
+
+    // Load default (overall) on page load
+    fetchReports('overall');
 
     filterSelect.addEventListener('change', () => {
         const selectedFilter = filterSelect.value;
-        
-        fetch(`api/filter.php?filter=${selectedFilter}`)
+        fetchReports(selectedFilter);
+    });
+
+    function fetchReports(filter) {
+        fetch(`api/filter.php?filter=${filter}`)
             .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    console.error(data.message);
-                } else {
-                    console.log(data.data);
+            .then(result => {
+                if (result.error) {
+                    console.error(result.message);
+                    return;
                 }
 
-                displayReports(data.data, selectedFilter);
+                displayReports(result.data, filter);
             })
             .catch(error => {
                 console.error('Error:', error);
             });
-    })
+    }
 });
 
 function displayReports(data, selectedFilter) {
-    const totalSubmitted = document.getElementById('total-submitted');
-    const totalForReview = document.getElementById('total-for-review');
-    const totalForInterview = document.getElementById('total-for-interview');
-    const totalApproved = document.getElementById('total-approved');
-    const totalDenied = document.getElementById('total-denied');
-    const totalCompleted = document.getElementById('total-completed');
-    const totalWithdrawn = document.getElementById('total-withdrawn');
-    const totalApplications = document.getElementById('total-applications');
-    
-    const totalSubmittedPercentage = document.getElementById('total-submitted-percentage');
-    const totalForReviewPercentage = document.getElementById('total-for-review-percentage');
-    const totalForInterviewPercentage = document.getElementById('total-for-interview-percentage');
-    const totalApprovedPercentage = document.getElementById('total-approved-percentage');
-    const totalDeniedPercentage = document.getElementById('total-denied-percentage');
-    const totalCompletedPercentage = document.getElementById('total-completed-percentage');
-    const totalWithdrawnPercentage = document.getElementById('total-withdrawn-percentage');
-    const totalApplicationsPercentage = document.getElementById('total-applications-percentage');
+    const update = (id, value) => {
+        document.getElementById(id).textContent = value ?? 0;
+        document.getElementById(`${id}-percentage`).textContent = 
+            data.total_applications > 0
+                ? `${((value / data.total_applications) * 100).toFixed(2)}% of total applications`
+                : '0% of total applications';
+    };
 
-    totalSubmitted.textContent = data.total_submitted;
-    totalForReview.textContent = data.total_for_review;
-    totalForInterview.textContent = data.total_for_interview;
-    totalApproved.textContent = data.total_approved;
-    totalDenied.textContent = data.total_denied;
-    totalCompleted.textContent = data.total_completed;
-    totalWithdrawn.textContent = data.total_withdrawn;
-    totalApplications.textContent = data.total_applications;
+    update('total-submitted', data.total_submitted);
+    update('total-for-review', data.total_for_review);
+    update('total-for-interview', data.total_for_interview);
+    update('total-approved', data.total_approved);
+    update('total-denied', data.total_denied);
+    update('total-completed', data.total_completed);
+    update('total-withdrawn', data.total_withdrawn);
 
-    totalSubmittedPercentage.textContent = calculatePercentage(data.total_submitted, data.total_applications);
-    totalForReviewPercentage.textContent = calculatePercentage(data.total_for_review, data.total_applications);
-    totalForInterviewPercentage.textContent = calculatePercentage(data.total_for_interview, data.total_applications);
-    totalApprovedPercentage.textContent = calculatePercentage(data.total_approved, data.total_applications);
-    totalDeniedPercentage.textContent = calculatePercentage(data.total_denied, data.total_applications);
-    totalCompletedPercentage.textContent = calculatePercentage(data.total_completed, data.total_applications);
-    totalWithdrawnPercentage.textContent = calculatePercentage(data.total_withdrawn, data.total_applications);
+    document.getElementById('total-applications').textContent = data.total_applications;
 
-    let percentageText = 'Overall';
-    switch (selectedFilter) {
-        case 'monthly':
-            percentageText = 'Monthly';
-            break;
-        case 'six_months':
-            percentageText = 'Last Six Months';
-            break;
-        case 'yearly':
-            percentageText = 'This Year';
-            break;
-        default:
-            percentageText = 'Overall';
-            break;
-    }
-    totalApplicationsPercentage.textContent = percentageText;
-}
-
-function calculatePercentage(total, totalApplications) {
-    if (!total || !totalApplications) {
-        return '0% of total applications';
-    }
-
-    const percentage = ((total / totalApplications) * 100).toFixed(2);
-    return `${percentage}% of total applications`;
+    // Update label
+    const totalLabel = document.getElementById('total-applications-percentage');
+    const labelMap = {
+        'monthly': 'Monthly',
+        'six_months': 'Last Six Months',
+        'yearly': 'This Year',
+        'overall': 'Overall'
+    };
+    totalLabel.textContent = labelMap[selectedFilter] || 'Overall';
 }

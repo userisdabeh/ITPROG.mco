@@ -7,31 +7,6 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-if (!isset($_GET['filter'])) {
-    http_response_code(400);
-    echo json_encode(['error' => true, 'message' => 'Filter is required']);
-    exit;
-}
-
-$filter = $_GET['filter'];
-$whereClause = "";
-
-switch ($filter) {
-    case 'monthly':
-        $whereClause = "WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)";
-        break;
-    case 'six_months':
-        $whereClause = "WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)";
-        break;
-    case 'yearly':
-        $whereClause = "WHERE YEAR(created_at) = YEAR(CURDATE())";
-        break;
-    case 'overall':
-    default:
-        $whereClause = "";
-        break;
-}
-
 require_once '../../../../server/db.php';
 
 $sql = "SELECT 
@@ -43,13 +18,12 @@ $sql = "SELECT
     COUNT(CASE WHEN status = 'completed' THEN 1 END) AS total_completed,
     COUNT(CASE WHEN status = 'withdrawn' THEN 1 END) AS total_withdrawn,
     COUNT(*) AS total_applications
-    FROM adoption_applications $whereClause";
+    FROM adoption_applications";
 
 $result = $conn->query($sql);
 
 if (!$result) {
-    http_response_code(500);
-    echo json_encode(['error' => true, 'message' => 'Failed to fetch data']);
+    echo json_encode(['error' => true, 'message' => 'Query failed']);
     exit;
 }
 
@@ -59,5 +33,4 @@ echo json_encode([
     'error' => false,
     'data' => $data
 ]);
-
-$conn->close();
+?>
