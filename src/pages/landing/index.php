@@ -3,8 +3,13 @@ session_start();
 include(__DIR__ . '/../../../server/db.php');
 
 if(isset($_SESSION['user_id'])) {
-    header("Location: ../home/index.php");
-    exit();
+    if ($_SESSION['role'] === 'user') {
+        header("Location: ../home/index.php");
+        exit();
+    } else {
+        header("Location: ../adminDashboard");
+        exit();
+    }
 }
 ?>
 
