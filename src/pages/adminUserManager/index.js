@@ -1,29 +1,3 @@
-const viewUserModalBtns = document.querySelectorAll('#viewUserBtn');
-viewUserModalBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const userId = btn.getAttribute('data-user-id');
-        fetch(`api/getUsersByID.php?id=${userId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.message);
-                    return;
-                }
-
-                document.getElementById('user-id').textContent = data.id;
-                document.getElementById('user-name').textContent = data.full_name;
-                document.getElementById('user-email').textContent = data.email;
-                document.getElementById('user-phone').textContent = data.phone;
-                document.getElementById('user-join-date').textContent = data.created_at;
-                document.getElementById('user-status').textContent = data.is_active ? 'Active' : 'Inactive';
-                document.getElementById('user-role').textContent = data.role;
-            })
-            .catch(err => {
-                console.error('Error fetching user details:', err);
-                return;
-            });
-    });
-});
 
 const deleteUserModalBtns = document.querySelectorAll('#deleteUserBtn');
 deleteUserModalBtns.forEach(btn => {
@@ -52,3 +26,56 @@ confirmDeleteBtn.addEventListener('click', () => {
             alert('Failed to delete user. Please try again.');
         });
 })
+
+document.addEventListener('DOMContentLoaded', () => {
+    const filterForm = document.querySelector('.filter-form');
+
+    filterForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const params = new URLSearchParams(new FormData(filterForm)).toString();
+
+        fetch(`api/filterUsers.php?${params}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.message);
+                    return;
+                }
+
+                updateUserTable(data.users);
+            })
+            .catch(err => {
+                console.error('Filter error:', err);
+            });
+    });
+});
+
+function updateUserTable(users) {
+    const tbody = document.querySelector('tbody');
+    tbody.innerHTML = ''; // Clear current rows
+
+    users.forEach(user => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${user.id}</td>
+            <td>${user.full_name}</td>
+            <td>${user.email}</td>
+            <td>${user.phone}</td>
+            <td>${user.created_at}</td>
+            <td>${user.is_active == 1 ? 'Active' : 'Inactive'}</td>
+            <td class="text-capitalize">${user.role}</td>
+            <td>
+                <div class="user-actions">
+                    <button class="btn btn-action" data-bs-toggle="modal" data-bs-target="#viewUserModal" data-user-id="${user.id}">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <button class="btn btn-action" data-bs-toggle="modal" data-bs-target="#deleteUserModal" data-user-id="${user.id}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}

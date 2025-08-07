@@ -9,40 +9,105 @@
 
     include_once '../../../server/db.php';
 
-    try {
-        $getPets = $conn->prepare("SELECT 
-                                        p.id,
-                                        p.microchip_id,
-                                        p.name,
-                                        p.pet_type_id,
-                                        p.breed_id,
-                                        pt.type_name,
-                                        b.breed_name,
-                                        p.age_years,
-                                        p.age_months,
-                                        p.gender,
-                                        p.size,
-                                        p.weight,
-                                        p.is_spayed_neutered,
-                                        p.is_house_trained,
-                                        p.good_with_kids,
-                                        p.good_with_pets,
-                                        p.energy_level,
-                                        p.status,
-                                        p.is_featured
-                                    FROM pets p
-                                    JOIN pet_types pt ON p.pet_type_id = pt.id
-                                    JOIN breeds b ON b.id = p.breed_id
-                                    ORDER BY p.id ASC;");
-        if ($getPets) {
-            $getPets->execute();
-            $result = $getPets->get_result();
-            $pets = $result->fetch_all(MYSQLI_ASSOC);
-        }
+    $conditions = [];
+$params = [];
 
-    } catch (Exception $e) {
-        echo "Error: " . $e->getMessage();
+// Search
+if (!empty($_GET['search'])) {
+    $conditions[] = "(p.name LIKE ? OR p.microchip_id LIKE ?)";
+    $search = "%" . $_GET['search'] . "%";
+    $params[] = $search;
+    $params[] = $search;
+}
+
+// Pet Type
+if (!empty($_GET['pet-type'])) {
+    $conditions[] = "pt.type_name = ?";
+    $params[] = $_GET['pet-type'];
+}
+
+// Breed
+if (!empty($_GET['pet-species'])) {
+    $conditions[] = "b.breed_name = ?";
+    $params[] = $_GET['pet-species'];
+}
+
+// Age (months range)
+if (isset($_GET['pet-age-min'], $_GET['pet-age-max']) && $_GET['pet-age-min'] !== '' && $_GET['pet-age-max'] !== '') {
+    $conditions[] = "(p.age_months + (p.age_years * 12)) BETWEEN ? AND ?";
+    $params[] = intval($_GET['pet-age-min']);
+    $params[] = intval($_GET['pet-age-max']);
+}
+
+// Gender
+if (!empty($_GET['pet-gender'])) {
+    $conditions[] = "p.gender = ?";
+    $params[] = $_GET['pet-gender'];
+}
+
+// Size
+if (!empty($_GET['pet-size'])) {
+    $conditions[] = "p.size = ?";
+    $params[] = $_GET['pet-size'];
+}
+
+// Weight
+if (isset($_GET['pet-weight-min'], $_GET['pet-weight-max']) && $_GET['pet-weight-min'] !== '' && $_GET['pet-weight-max'] !== '') {
+    $conditions[] = "p.weight BETWEEN ? AND ?";
+    $params[] = $_GET['pet-weight-min'];
+    $params[] = $_GET['pet-weight-max'];
+}
+
+// Status
+if (!empty($_GET['pet-status'])) {
+    $conditions[] = "p.status = ?";
+    $params[] = $_GET['pet-status'];
+}
+
+// Energy Level
+if (!empty($_GET['pet-energy'])) {
+    $conditions[] = "p.energy_level = ?";
+    $params[] = $_GET['pet-energy'];
+}
+
+// Checkboxes
+$checkboxFields = [
+    'pet-is-spayed-neutered' => 'p.is_spayed_neutered',
+    'pet-is-house-trained' => 'p.is_house_trained',
+    'pet-is-good-with-children' => 'p.good_with_kids',
+    'pet-is-good-with-other-pets' => 'p.good_with_pets',
+    'pet-featured-only' => 'p.is_featured'
+];
+foreach ($checkboxFields as $input => $column) {
+    if (isset($_GET[$input])) {
+        $conditions[] = "$column = 1";
     }
+}
+
+// Build query
+$whereClause = count($conditions) ? 'WHERE ' . implode(' AND ', $conditions) : '';
+$query = "SELECT 
+            p.id, p.microchip_id, p.name, p.pet_type_id, p.breed_id, pt.type_name, b.breed_name,
+            p.age_years, p.age_months, p.gender, p.size, p.weight, p.is_spayed_neutered,
+            p.is_house_trained, p.good_with_kids, p.good_with_pets, p.energy_level,
+            p.status, p.is_featured
+          FROM pets p
+          JOIN pet_types pt ON p.pet_type_id = pt.id
+          JOIN breeds b ON b.id = p.breed_id
+          $whereClause
+          ORDER BY p.id ASC";
+
+$stmt = $conn->prepare($query);
+
+if (!empty($params)) {
+    $types = str_repeat('s', count($params)); // all are treated as strings for simplicity
+    $stmt->bind_param($types, ...$params);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
+$pets = $result->fetch_all(MYSQLI_ASSOC);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -115,9 +115,6 @@
                                 <td class="text-capitalize"><?php echo $user['role']; ?></td>
                                 <td>
                                     <div class="user-actions">
-                                        <button class="btn btn-action" id="viewUserBtn" data-bs-toggle="modal" data-bs-target="#viewUserModal" data-user-id="<?php echo $user['id']; ?>">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
                                         <button class="btn btn-action" id="deleteUserBtn" data-bs-toggle="modal" data-bs-target="#deleteUserModal" data-user-id="<?php echo $user['id']; ?>">
                                             <i class="bi bi-trash"></i>
                                         </button>
@@ -130,49 +127,6 @@
                 </div>
             </section>
         </main>
-        <div class="modal fade" id="viewUserModal" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="modal-title fs-5" id="viewUserModalLabel">User Details</h3>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <ul class="user-details">
-                            <li class="user-detail">
-                                <span class="detail-label" id="user-id-label">ID:</span>
-                                <span class="detail-value" id="user-id"></span>
-                            </li>
-                            <li class="user-detail">
-                                <span class="detail-label" id="user-name-label">Full Name:</span>
-                                <span class="detail-value" id="user-name"></span>
-                            </li>
-                            <li class="user-detail">
-                                <span class="detail-label" id="user-email-label">Email:</span>
-                                <span class="detail-value" id="user-email"></span>
-                            </li>
-                            <li class="user-detail">
-                                <span class="detail-label" id="user-phone-label">Phone:</span>
-                                <span class="detail-value" id="user-phone"></span>
-                            </li>
-                            <li class="user-detail">
-                                <span class="detail-label" id="user-join-date-label">Join Date:</span>
-                                <span class="detail-value" id="user-join-date"></span>
-                            </li>
-                            <li class="user-detail">
-                                <span class="detail-label" id="user-status-label">Status:</span>
-                                <span class="detail-value" id="user-status"></span>
-                            </li>
-                            <li class="user-detail">
-                                <span class="detail-label" id="user-role-label">Role:</span>
-                                <span class="detail-value" id="user-role"></span>
-                            </li>
-                            <li class="user-detail"></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">

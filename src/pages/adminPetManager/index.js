@@ -33,7 +33,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 featured
             } = this.dataset;
 
-            // Set field values
             document.getElementById('edit-pet-id').value = id;
             document.getElementById('edit-name').value = name;
             document.getElementById('edit-age-years').value = ageYears;
@@ -47,17 +46,11 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('edit-status').value = String(status);
             document.getElementById('edit-energy').value = String(energy);
 
-            // Checkboxes (cast as string just to be safe)
             document.getElementById('edit-spayed').checked = spayed === '1';
             document.getElementById('edit-house-trained').checked = house === '1';
             document.getElementById('edit-good-kids').checked = kids === '1';
             document.getElementById('edit-good-pets').checked = pets === '1';
             document.getElementById('edit-featured').checked = featured === '1';
-
-            console.log({
-                typeId, breedId, gender, size, status, energy,
-                spayed, house, kids, pets, featured
-            });
         });
     });
 
@@ -78,7 +71,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Delete response:', data);
                     if (data.success) {
                         alert('Pet deleted successfully.');
                         window.location.reload();
@@ -91,8 +83,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.error(error);
                 });
             }
-
-            console.log('Delete button clicked for pet ID:', petId);
         });
     });
+
+    // Clear Button Handler
+    const resetBtn = document.getElementById('reset-btn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            document.getElementById('filter-form').reset();
+            window.location.href = window.location.pathname; // Reload with no filters
+        });
+    }
 });
