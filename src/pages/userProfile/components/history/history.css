@@ -127,10 +127,10 @@
 }
 
 /* Color accents by type */
-.timeline-application_submitted .dot { background: #6366f1; } /* indigo */
-.timeline-application_status   .dot { background: #f59e0b; } /* amber */
-.timeline-adoption             .dot { background: #10b981; } /* green */
-.timeline-activity             .dot { background: #9ca3af; } /* gray */
+.timeline-application_submitted .dot { background: #6366f1; } 
+.timeline-application_status   .dot { background: #f59e0b; } 
+.timeline-adoption             .dot { background: #10b981; } 
+.timeline-activity             .dot { background: #9ca3af; } 
 
 /* Responsive */
 @media (max-width: 768px) {
