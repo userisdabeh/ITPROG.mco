@@ -56,6 +56,16 @@
         'completed' => 'Completed',
         'withdrawn' => 'Withdrawn'
     ];
+
+    $statusColors = [
+        'submitted' => 'bg-primary',
+        'under_review' => 'bg-warning',
+        'interview_required' => 'bg-info',
+        'approved' => 'bg-success',
+        'denied' => 'bg-danger',
+        'completed' => 'bg-success',
+        'withdrawn' => 'bg-secondary'
+    ];
 ?>
 
 <!DOCTYPE html>
@@ -108,7 +118,11 @@
                             <td scope="row"><?php echo $application['full_name']; ?></td>
                             <td><?php echo $application['name']; ?></td>
                             <td><?php echo $application['created_at']; ?></td>
-                            <td class="text-capitalize"><?php echo $displayStatus[$application['status']]; ?></td>
+                            <td>
+                                <span class="badge <?php echo $statusColors[$application['status']]; ?> text-capitalize">
+                                    <?php echo $displayStatus[$application['status']]; ?>
+                                </span>
+                            </td>
                             <td>
                                 <?php if ($application['status'] === 'submitted') : ?>
                                     <button type="button" class="btn btn-sm btn-primary review-application-button" id="startReviewApplication" data-bs-application-id="<?php echo $application['adoption_id']; ?>">

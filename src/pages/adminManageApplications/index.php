@@ -60,6 +60,15 @@
         'withdrawn' => 'Withdrawn'
     ];
     
+    $statusColors = [
+        'submitted' => 'bg-primary',
+        'under_review' => 'bg-warning',
+        'interview_required' => 'bg-info',
+        'approved' => 'bg-success',
+        'denied' => 'bg-danger',
+        'completed' => 'bg-success',
+        'withdrawn' => 'bg-secondary'
+    ];
 ?>
 
 <!DOCTYPE html>
@@ -96,7 +105,7 @@
                         <p class="text-muted">Review and manage adoption applications.</p>
                     </div>
                 </div>
-                <span class="badge bg-warning" id="application-status" data-interview-completed="<?php echo $application['interview_completed_at'] === null ? 'false' : 'true'; ?>">
+                <span class="badge <?php echo $statusColors[$application['status']]; ?>" id="application-status" data-interview-completed="<?php echo $application['interview_completed_at'] === null ? 'false' : 'true'; ?>">
                     <?php echo $statusMap[$application['status']]; ?>
                 </span>
             </section>
