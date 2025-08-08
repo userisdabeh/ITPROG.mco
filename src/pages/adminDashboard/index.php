@@ -47,17 +47,23 @@
         echo "Error: " . $e->getMessage();
     }
 
-    // Get total adoptions
+    // Total adoptions = real adoptions + completed apps
     try {
-        $getTotalAdoptions = $conn->prepare("SELECT COUNT(*) AS total_adoptions FROM adoptions");
-        if ($getTotalAdoptions) {
-            $getTotalAdoptions->execute();
-            $result = $getTotalAdoptions->get_result();
-            $totalAdoptions = $result->fetch_assoc();
-        }
+        $getTotalAdoptions = $conn->query("
+            SELECT COUNT(*) AS total_adoptions
+            FROM (
+                SELECT id, created_at AS event_time FROM adoptions
+                UNION ALL
+                SELECT id, COALESCE(completed_at, updated_at, created_at) AS event_time
+                FROM adoption_applications
+                WHERE status = 'completed'
+            ) t
+    ");
+    $totalAdoptions = $getTotalAdoptions->fetch_assoc();
     } catch (Exception $e) {
-        echo "Error: " . $e->getMessage();
+    echo 'Error: ' . $e->getMessage();
     }
+
 
     $month = date('m');
     $year = date('Y');
@@ -80,11 +86,24 @@
     $getPendingAppsThisMonth->execute();
     $pendingMonth = $getPendingAppsThisMonth->get_result()->fetch_assoc();
 
-    // Adoptions this month
-    $getAdoptionsThisMonth = $conn->prepare("SELECT COUNT(*) AS adoptions_this_month FROM adoptions WHERE MONTH(created_at) = ? AND YEAR(created_at) = ?");
-    $getAdoptionsThisMonth->bind_param("ii", $month, $year);
+    // Adoptions this month = real adoptions + completed apps in month
+    $getAdoptionsThisMonth = $conn->prepare("
+        SELECT COUNT(*) AS adoptions_this_month
+        FROM (
+            SELECT created_at AS event_time FROM adoptions
+            WHERE MONTH(created_at) = ? AND YEAR(created_at) = ?
+            UNION ALL
+            SELECT COALESCE(completed_at, updated_at, created_at) AS event_time
+            FROM adoption_applications
+            WHERE status = 'completed'
+                AND MONTH(COALESCE(completed_at, updated_at, created_at)) = ?
+                AND YEAR(COALESCE(completed_at, updated_at, created_at)) = ?
+        ) t
+    ");
+    $getAdoptionsThisMonth->bind_param("iiii", $month, $year, $month, $year);
     $getAdoptionsThisMonth->execute();
     $adoptionsMonth = $getAdoptionsThisMonth->get_result()->fetch_assoc();
+
 
     // Latest added pet
     $getRecentPet = $conn->query("
@@ -117,22 +136,31 @@
         FROM adoption_applications aa 
         JOIN users u ON aa.user_id = u.id 
         JOIN pets p ON aa.pet_id = p.id 
-        WHERE aa.status = 'rejected' 
+        WHERE aa.status = 'denied' 
         ORDER BY aa.updated_at DESC 
         LIMIT 1
     ");
     $recentRejected = $getRecentRejected->fetch_assoc();
 
-    // Latest adoption
+    // Latest adoption OR completed application
     $getRecentAdoption = $conn->query("
-        SELECT u.full_name, p.name AS pet_name, a.created_at 
-        FROM adoptions a 
-        JOIN users u ON a.user_id = u.id 
-        JOIN pets p ON a.pet_id = p.id 
-        ORDER BY a.created_at DESC 
+        SELECT u.full_name, p.name AS pet_name, ev.event_time
+        FROM (
+            SELECT a.user_id, a.pet_id, a.created_at AS event_time
+            FROM adoptions a
+            UNION ALL
+            SELECT aa.user_id, aa.pet_id,
+                   COALESCE(aa.completed_at, aa.updated_at, aa.created_at) AS event_time
+            FROM adoption_applications aa
+            WHERE aa.status = 'completed'
+        ) ev
+        JOIN users u ON ev.user_id = u.id
+        JOIN pets p ON ev.pet_id = p.id
+        ORDER BY ev.event_time DESC
         LIMIT 1
     ");
     $recentAdoption = $getRecentAdoption->fetch_assoc();
+
 
     function timeAgo($datetime) {
         $timestamp = strtotime($datetime);
@@ -241,7 +269,7 @@
                         </div>
                         <div class="activity-item">
                             <div class="activity-alert">
-                                <h6 class="activity-title">Application Rejected</h6>
+                                <h6 class="activity-title">Application Denied</h6>
                                 <p class="activity-details">
                                     <?= $recentRejected ? htmlspecialchars($recentRejected['full_name'] . ' - ' . $recentRejected['pet_name']) : 'No recent rejection' ?>
                                 </p>
@@ -255,7 +283,7 @@
                                     <?= $recentAdoption ? htmlspecialchars($recentAdoption['full_name'] . ' - ' . $recentAdoption['pet_name']) : 'No recent adoption' ?>
                                 </p>
                             </div>
-                            <span class="activity-time"><?= $recentAdoption ? timeAgo($recentAdoption['adoption_date']) : 'N/A' ?></span>
+                            <span class="activity-time"><?= $recentAdoption ? timeAgo($recentAdoption['event_time']) : 'N/A' ?></span>
                         </div>
                     </div>
                 </section>
