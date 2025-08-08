@@ -309,7 +309,8 @@ INSERT INTO `breeds` (`pet_type_id`, `breed_name`, `size_category`) VALUES
 -- Insert admin user with default profile image
 INSERT INTO `users` (`full_name`, `email`, `password`, `age`, `current_address`, `permanent_address`, `phone`, `role`, `is_active`) VALUES
 ('Admin User', 'admin@wonderpets.com', '1234', 30, 'Shelter Address', 'Shelter Address', '+1234567890', 'admin', 1),
-('Darren Sanchez', 'darren_sanchez@dlsu.edu.ph', '1234', 20, 'Mandaluyong', 'Mandaluyong', '+1234567890', 'user', 1);
+('Darren Sanchez', 'darren_sanchez@dlsu.edu.ph', '1234', 20, 'Mandaluyong', 'Mandaluyong', '+1234567890', 'user', 1),
+('Example User', 'user@example.com', '1234', 22, 'Quezon City', 'Quezon City', '+1234567890', 'user', 1);
 
 -- Insert sample pets
 INSERT INTO `pets` (`name`, `pet_type_id`, `breed_id`, `age_years`, `age_months`, `gender`, `size`, `weight`, `color`, `personality_traits`, `health_conditions`, `special_needs`, `description`, `adoption_fee`, `is_spayed_neutered`, `is_house_trained`, `good_with_kids`, `good_with_pets`, `energy_level`, `intake_date`, `status`, `is_featured`, `microchip_id`) VALUES
