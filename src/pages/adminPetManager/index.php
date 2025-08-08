@@ -8,6 +8,7 @@
     }
 
     include_once '../../../server/db.php';
+    include_once '../../api/image.php';
 
     $conditions = [];
 $params = [];
@@ -90,7 +91,7 @@ $query = "SELECT
             p.id, p.microchip_id, p.name, p.pet_type_id, p.breed_id, pt.type_name, b.breed_name,
             p.age_years, p.age_months, p.gender, p.size, p.weight, p.is_spayed_neutered,
             p.is_house_trained, p.good_with_kids, p.good_with_pets, p.energy_level,
-            p.status, p.is_featured
+            p.status, p.is_featured, p.pet_image, p.pet_image_type, p.description
           FROM pets p
           JOIN pet_types pt ON p.pet_type_id = pt.id
           JOIN breeds b ON b.id = p.breed_id
@@ -270,6 +271,7 @@ $pets = $result->fetch_all(MYSQLI_ASSOC);
                     <thead>
                         <tr>
                             <th scope="col">Pet ID</th>
+                            <th scope="col">Photo</th>
                             <th scope="col">Microchip ID</th>
                             <th scope="col">Name</th>
                             <th scope="col">Type</th>
@@ -293,6 +295,12 @@ $pets = $result->fetch_all(MYSQLI_ASSOC);
                         <?php foreach ($pets as $pet) : ?>
                             <tr>
                                 <td scope="row" class="text-center"><?php echo $pet['id']; ?></td>
+                                <td class="text-center">
+                                    <img src="<?= displayImage($pet['pet_image'], $pet['pet_image_type']) ?>" 
+                                         alt="<?= htmlspecialchars($pet['name']) ?>" 
+                                         class="pet-thumbnail" 
+                                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                                </td>
                                 <td class="text-center"><?php echo $pet['microchip_id']; ?></td>
                                 <td class="text-center"><?php echo $pet['name']; ?></td>
                                 <td class="text-center"><?php echo $pet['type_name']; ?></td>
@@ -318,7 +326,7 @@ $pets = $result->fetch_all(MYSQLI_ASSOC);
                                     <div class="pet-actions">
                                         <button type="button" class="btn btn-primary edit-btn"
                                             data-bs-id="<?= $pet['id']; ?>"
-                                            data-name="<?= $pet['name']; ?>"
+                                            data-name="<?= htmlspecialchars($pet['name']); ?>"
                                             data-age-years="<?= $pet['age_years']; ?>"
                                             data-age-months="<?= $pet['age_months']; ?>"
                                             data-weight="<?= $pet['weight']; ?>"
@@ -328,6 +336,7 @@ $pets = $result->fetch_all(MYSQLI_ASSOC);
                                             data-size="<?= $pet['size']; ?>"
                                             data-status="<?= $pet['status']; ?>"
                                             data-energy="<?= $pet['energy_level']; ?>"
+                                            data-description="<?= htmlspecialchars($pet['description'] ?? ''); ?>"
                                             data-spayed="<?= $pet['is_spayed_neutered']; ?>"
                                             data-house="<?= $pet['is_house_trained']; ?>"
                                             data-kids="<?= $pet['good_with_kids']; ?>"
@@ -353,7 +362,7 @@ $pets = $result->fetch_all(MYSQLI_ASSOC);
 <div class="modal fade" id="editPetModal" tabindex="-1" aria-labelledby="editPetModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <form method="POST" action="editPet.php" id="editPetForm">
+      <form method="POST" action="editPet.php" id="editPetForm" enctype="multipart/form-data">
         <div class="modal-header">
           <h5 class="modal-title" id="editPetModalLabel">Edit Pet</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -446,6 +455,19 @@ $pets = $result->fetch_all(MYSQLI_ASSOC);
           </div>
 
           <div class="col-md-12">
+            <label class="form-label">Pet Photo</label>
+            <div class="pet-photo-section">
+              <img id="edit-pet-photo" src="https://placehold.co/120x120" alt="Pet Photo" 
+                   style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;">
+              <div>
+                <input type="file" name="pet_image" id="edit-pet-image-input" accept="image/jpeg,image/png,image/gif" 
+                       class="form-control" onchange="previewEditImage(this)">
+                <small class="form-text text-muted">Upload JPG, PNG, or GIF (max 5MB)</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-12">
             <label for="edit-description" class="form-label">Description</label>
             <textarea class="form-control" name="description" id="edit-description" rows="2"></textarea>
           </div>
@@ -481,5 +503,83 @@ $pets = $result->fetch_all(MYSQLI_ASSOC);
     </div>
   </div>
 </div>
+
+<script>
+function previewEditImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('edit-pet-photo').src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Handle modal population when edit button is clicked
+document.addEventListener('DOMContentLoaded', function() {
+    const editButtons = document.querySelectorAll('.edit-btn');
+    
+    editButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Get pet data from data attributes
+            const petId = this.dataset.bsId;
+            const petName = this.dataset.name;
+            const ageYears = this.dataset.ageYears;
+            const ageMonths = this.dataset.ageMonths;
+            const weight = this.dataset.weight;
+            const type = this.dataset.type;
+            const breed = this.dataset.breed;
+            const gender = this.dataset.gender;
+            const size = this.dataset.size;
+            const status = this.dataset.status;
+            const energy = this.dataset.energy;
+            const description = this.dataset.description;
+            const spayed = this.dataset.spayed;
+            const house = this.dataset.house;
+            const kids = this.dataset.kids;
+            const pets = this.dataset.pets;
+            const featured = this.dataset.featured;
+
+            // Populate modal fields
+            document.getElementById('edit-pet-id').value = petId;
+            document.getElementById('edit-name').value = petName;
+            document.getElementById('edit-age-years').value = ageYears;
+            document.getElementById('edit-age-months').value = ageMonths;
+            document.getElementById('edit-weight').value = weight;
+            document.getElementById('editPetType').value = type;
+            document.getElementById('editPetBreed').value = breed;
+            document.getElementById('edit-gender').value = gender;
+            document.getElementById('edit-size').value = size;
+            document.getElementById('edit-status').value = status;
+            document.getElementById('edit-energy').value = energy;
+            document.getElementById('edit-description').value = description || '';
+            
+            // Set checkboxes
+            document.getElementById('edit-spayed').checked = spayed == '1';
+            document.getElementById('edit-house-trained').checked = house == '1';
+            document.getElementById('edit-good-kids').checked = kids == '1';
+            document.getElementById('edit-good-pets').checked = pets == '1';
+            document.getElementById('edit-featured').checked = featured == '1';
+            
+            // Set current pet photo from the table row
+            const petRow = this.closest('tr');
+            const currentPhoto = petRow.querySelector('.pet-thumbnail').src;
+            document.getElementById('edit-pet-photo').src = currentPhoto;
+            
+            // Clear the file input so user can select a new image if needed
+            document.getElementById('edit-pet-image-input').value = '';
+        });
+    });
+    
+    // Reset image preview when modal is closed without saving
+    const editModal = document.getElementById('editPetModal');
+    editModal.addEventListener('hidden.bs.modal', function() {
+        // Reset the image preview to original when modal is closed without saving
+        const fileInput = document.getElementById('edit-pet-image-input');
+        fileInput.value = '';
+    });
+});
+</script>
+
     </body>
 </html>

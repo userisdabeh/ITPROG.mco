@@ -25,7 +25,10 @@ SELECT  p.*,
         b.breed_name,
         pt.type_name,
         (COALESCE(p.age_years,0) * 12 + COALESCE(p.age_months,0)) AS age_in_months,
-        (SELECT photo_path FROM pet_photos WHERE pet_id = p.id AND is_primary = 1 LIMIT 1) AS primary_photo,
+        COALESCE(
+            (SELECT photo_path FROM pet_photos WHERE pet_id = p.id AND is_primary = 1 LIMIT 1),
+            CASE WHEN p.pet_image IS NOT NULL THEN CONCAT('data:', p.pet_image_type, ';base64,', TO_BASE64(p.pet_image)) END
+        ) AS primary_photo,
         CASE WHEN uf.user_id IS NOT NULL THEN 1 ELSE 0 END AS is_favorited
 FROM pets p
 LEFT JOIN breeds b     ON b.id = p.breed_id

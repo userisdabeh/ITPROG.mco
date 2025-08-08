@@ -15,9 +15,10 @@ $is_favorited = !empty($pet['is_favorited']) && $pet['is_favorited'];
 $current_page = $_SERVER['REQUEST_URI'];
 
 $image_src = '';
-if (!empty($pet['pet_image'])) {
+if (!empty($pet['primary_photo'])) {
+    $image_src = htmlspecialchars($pet['primary_photo']);
+} else if (!empty($pet['pet_image'])) {
     if (!empty($pet['pet_image_type'])) {
-        // Binary image data from database
         $image_src = 'data:' . $pet['pet_image_type'] . ';base64,' . base64_encode($pet['pet_image']);
     } else {
         // Image path
