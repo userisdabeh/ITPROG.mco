@@ -47,22 +47,22 @@
         echo "Error: " . $e->getMessage();
     }
 
-    // Total adoptions = real adoptions + completed apps
-    try {
-        $getTotalAdoptions = $conn->query("
-            SELECT COUNT(*) AS total_adoptions
-            FROM (
-                SELECT id, created_at AS event_time FROM adoptions
-                UNION ALL
-                SELECT id, COALESCE(completed_at, updated_at, created_at) AS event_time
-                FROM adoption_applications
-                WHERE status = 'completed'
-            ) t
+    // Total adoptions = adoptions + completed apps that don't have an adoptions row
+    $getTotalAdoptions = $conn->query("
+        SELECT COUNT(*) AS total_adoptions
+        FROM (
+            SELECT a.id, a.created_at AS event_time
+            FROM adoptions a
+            UNION
+            SELECT aa.id, COALESCE(aa.completed_at, aa.updated_at, aa.created_at) AS event_time
+            FROM adoption_applications aa
+            WHERE aa.status = 'completed'
+                AND NOT EXISTS (
+                    SELECT 1 FROM adoptions a WHERE a.application_id = aa.id
+            )
+        ) t
     ");
     $totalAdoptions = $getTotalAdoptions->fetch_assoc();
-    } catch (Exception $e) {
-    echo 'Error: ' . $e->getMessage();
-    }
 
 
     $month = date('m');
@@ -90,14 +90,18 @@
     $getAdoptionsThisMonth = $conn->prepare("
         SELECT COUNT(*) AS adoptions_this_month
         FROM (
-            SELECT created_at AS event_time FROM adoptions
-            WHERE MONTH(created_at) = ? AND YEAR(created_at) = ?
-            UNION ALL
-            SELECT COALESCE(completed_at, updated_at, created_at) AS event_time
-            FROM adoption_applications
-            WHERE status = 'completed'
-                AND MONTH(COALESCE(completed_at, updated_at, created_at)) = ?
-                AND YEAR(COALESCE(completed_at, updated_at, created_at)) = ?
+            SELECT a.created_at AS event_time
+            FROM adoptions a
+            WHERE MONTH(a.created_at) = ? AND YEAR(a.created_at) = ?
+            UNION
+            SELECT COALESCE(aa.completed_at, aa.updated_at, aa.created_at) AS event_time
+            FROM adoption_applications aa
+            WHERE aa.status = 'completed'
+                AND MONTH(COALESCE(aa.completed_at, aa.updated_at, aa.created_at)) = ?
+                AND YEAR(COALESCE(aa.completed_at, aa.updated_at, aa.created_at)) = ?
+                AND NOT EXISTS (
+                    SELECT 1 FROM adoptions a WHERE a.application_id = aa.id
+                )
         ) t
     ");
     $getAdoptionsThisMonth->bind_param("iiii", $month, $year, $month, $year);
@@ -148,18 +152,22 @@
         FROM (
             SELECT a.user_id, a.pet_id, a.created_at AS event_time
             FROM adoptions a
-            UNION ALL
+            UNION
             SELECT aa.user_id, aa.pet_id,
-                   COALESCE(aa.completed_at, aa.updated_at, aa.created_at) AS event_time
+                COALESCE(aa.completed_at, aa.updated_at, aa.created_at) AS event_time
             FROM adoption_applications aa
             WHERE aa.status = 'completed'
+            AND NOT EXISTS (
+                SELECT 1 FROM adoptions a WHERE a.application_id = aa.id
+            )
         ) ev
         JOIN users u ON ev.user_id = u.id
-        JOIN pets p ON ev.pet_id = p.id
+        JOIN pets p  ON ev.pet_id = p.id
         ORDER BY ev.event_time DESC
         LIMIT 1
     ");
-    $recentAdoption = $getRecentAdoption->fetch_assoc();
+$recentAdoption = $getRecentAdoption->fetch_assoc();
+
 
 
     function timeAgo($datetime) {
