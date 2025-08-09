@@ -180,11 +180,11 @@
                     <input type="hidden" name="approvedBy" id="approvedBy" value="<?php echo $_SESSION['user_id']; ?>">
                     <div class="mb-3" id="interview-schedule-container">
                         <label for="interview-schedule" class="form-label">Interview Schedule</label>
-                        <input type="datetime-local" name="interview-schedule" id="interview-schedule" class="form-control">
+                        <input type="datetime-local" name="interview-schedule" id="interview-schedule" class="form-control" min="<?php echo date('Y-m-d\TH:i'); ?>">
                     </div>
                     <div class="mb-3" id="interview-completion-container">
                         <label for="interview-completion" class="form-label">Interview Completion</label>
-                        <input type="datetime-local" name="interview-completion" id="interview-completion" class="form-control">
+                        <input type="datetime-local" name="interview-completion" id="interview-completion" class="form-control" min="<?php echo date('Y-m-d\TH:i'); ?>">
                     </div>
                     <div class="mb-3" id="denial-reason-container">
                         <label for="denial-reason" class="form-label">Denial Reason</label>
